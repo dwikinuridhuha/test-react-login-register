@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import React, {useState, useRef, useEffect} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
@@ -63,6 +63,17 @@ const Register = (props) => {
   const [passwordAgain, setPasswordAgain] = useState("");
   const [successful, setSuccessful] = useState(false);
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = AuthService.getCurrentUser();
+
+    if (user) {
+      navigate("/dashboard");
+    }
+
+  }, []);
 
   const onChangeFirsName = (e) => {
     const firstname = e.target.value;
@@ -266,7 +277,7 @@ const Register = (props) => {
               </div>
 
               <div className="form-group">
-                <button className="btn btn-primary btn-block">Sign Up</button>
+                <button className="btn btn-primary btn-block">Register</button>
               </div>
             </div>
           )}
