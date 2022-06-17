@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
@@ -57,10 +58,9 @@ const Register = (props) => {
   const [grup, setGrup] = useState("");
   const [role, setRole] = useState("");
   const [tgl_lahir, setTgl_lahir] = useState("");
-  const [jenis_kelamin, setJenis_kelamin] = useState("");
-  const [strict_password, setStrict_password] = useState("");
+  const [strict_password, setStrict_password] = useState(false);
   const [password, setPassword] = useState("");
-  const [referral_code, setReferral_code] = useState("");
+  const [passwordAgain, setPasswordAgain] = useState("");
   const [successful, setSuccessful] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -94,11 +94,6 @@ const Register = (props) => {
     setTgl_lahir(tgl_lahir);
   };
 
-  const onChangeJenis_kelamin = (e) => {
-    const jenis_kelamin = e.target.value;
-    setJenis_kelamin(jenis_kelamin);
-  };
-
   const onChangeEmail = (e) => {
     const email = e.target.value;
     setEmail(email);
@@ -109,33 +104,44 @@ const Register = (props) => {
     setPassword(password);
   };
 
+  const onChangePasswordAgain = (e) => {
+    const passwordAgain = e.target.value;
+    setPasswordAgain(passwordAgain);
+  };
+
+
   const handleRegister = (e) => {
     e.preventDefault();
+
+    if(password !== passwordAgain) {
+      return;
+    }
 
     setMessage("");
     setSuccessful(false);
 
     form.current.validateAll();
 
-    // if (checkBtn.current.context._errors.length === 0) {
-    //   AuthService.register(email, password).then(
-    //     (response) => {
-    //       setMessage(response.data.message);
-    //       setSuccessful(true);
-    //     },
-    //     (error) => {
-    //       const resMessage =
-    //         (error.response &&
-    //           error.response.data &&
-    //           error.response.data.message) ||
-    //         error.message ||
-    //         error.toString();
-    //
-    //       setMessage(resMessage);
-    //       setSuccessful(false);
-    //     }
-    //   );
-    // }
+    if (checkBtn.current.context._errors.length === 0) {
+      AuthService.register(email, hp, firstName, lastName, grup, role, tgl_lahir, password, strict_password).then(
+        (response) => {
+          console.log(response.data)
+          setMessage(response.data.status.keterangan);
+          setSuccessful(true);
+        },
+        (error) => {
+          const resMessage =
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString();
+
+          setMessage(resMessage);
+          setSuccessful(false);
+        }
+      );
+    }
   };
 
   return (
@@ -199,23 +205,12 @@ const Register = (props) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="jenis_kelamin">Jenis Kelamin</label>
-                <Input
-                    type="text"
-                    className="form-control"
-                    name="jenis_kelamin"
-                    value={jenis_kelamin}
-                    onChange={onChangeJenis_kelamin}
-                    validations={[required]}
-                />
-              </div>
-
-              <div className="form-group">
                 <label htmlFor="grup">Grup</label>
                 <Input
                     type="text"
                     className="form-control"
                     name="grup"
+                    placeholder={"member"}
                     value={grup}
                     onChange={onChangeGrup}
                     validations={[required]}
@@ -247,14 +242,26 @@ const Register = (props) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <Input
+              <label htmlFor="password">Password</label>
+              <Input
                   type="password"
                   className="form-control"
                   name="password"
                   value={password}
                   onChange={onChangePassword}
                   validations={[required, vpassword]}
+              />
+            </div>
+
+              <div className="form-group">
+                <label htmlFor="confirm-password">Confirm Password</label>
+                <Input
+                    type="password"
+                    className="form-control"
+                    name="confirm-password"
+                    value={passwordAgain}
+                    onChange={onChangePasswordAgain}
+                    validations={[required, vpassword]}
                 />
               </div>
 
@@ -273,6 +280,10 @@ const Register = (props) => {
                 role="alert"
               >
                 {message}
+
+                <Link to={"/login"} className="mt-2 nav-link btn btn-info btn-bloc">
+                  Login Sekarang
+                </Link>
               </div>
             </div>
           )}
